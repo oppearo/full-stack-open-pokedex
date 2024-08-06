@@ -18,3 +18,7 @@ app.get('/version', (req, res) => {
 app.get('/health', (req, res) => {
   res.send('ok')
 })
+
+app.get('/hello', (req, res) => {
+  res.send('yes, this is dog')
+})

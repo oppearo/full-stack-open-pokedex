@@ -1,5 +1,8 @@
 name: Testing stuff
 
+env:
+  WILL_SKIP: ${{ contains(join(github.event.commits.*.message), '#skip') }}
+
 on:
   push:
     branches:
@@ -22,3 +25,9 @@ jobs:
         env:
           COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
         run: echo "$COMMIT_MESSAGES"
+      - name: test condition to false
+        if: ${{ github.env.WILL_SKIP == 'false' }}
+        run: echo "WILL_SKIP == false"
+      - name: test condition to true
+        if: ${{ github.env.WILL_SKIP == 'true' }}
+        run: echo "WILL_SKIP == true"

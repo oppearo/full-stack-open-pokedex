@@ -1,7 +1,7 @@
 name: Testing stuff
 
 env:
-  WILL_SKIP: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '#skip') }}
+  WILL_SKIP: ${{ (github.event_name == 'push') && (contains(github.event.head_commit.message, '#skip')) }}
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
         run: echo "$COMMITS"
       - name: commit messages
         env:
-          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+          COMMIT_MESSAGES: ${{ toJson(github.event.head_commit.message) }}
         run: echo "$COMMIT_MESSAGES"
       - name: test condition to false
         if: ${{ github.env.WILL_SKIP == 'false' }}

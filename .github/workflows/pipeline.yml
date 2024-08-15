@@ -1,7 +1,7 @@
 name: Deployment pipeline
 
 env:
-  WILL_SKIP: ${{ (github.event_name == 'push') && (contains(github.event.head_commit.message, '#skip')) }}
+  WILL_DEPLOY: ${{ (github.event_name == 'push') && !(contains(github.event.head_commit.message, '#skip')) }}
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
           path: playwright-report/
           retention-days: 30
   deployment:
-    if: ${{ github.env.WILL_SKIP == 'false' }}
+    if: ${{ github.env.WILL_DEPLOY == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Trigger deployment
@@ -47,7 +47,7 @@ jobs:
           apiKey: ${{ secrets.RENDER_API_KEY }}
           multipleDeployment: false #optional, default true
   tag_release:
-    if: ${{ github.env.WILL_SKIP == 'false' }}
+    if: ${{ github.env.WILL_DEPLOY == 'false' }}
     runs-on: ubuntu-latest
     needs: [simple_deployment_pipeline]
     steps:

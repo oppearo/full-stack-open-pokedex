@@ -1,5 +1,8 @@
 name: Deployment pipeline
 
+env:
+  WILL_SKIP: ${{ contains(join(github.event.commits.*.message), "#skip") }}
+
 on:
   push:
     branches:
@@ -33,6 +36,7 @@ jobs:
           path: playwright-report/
           retention-days: 30
   deployment:
+    if: ${{ github.env.WILL_SKIP == 'false' }}
     runs-on: ubuntu-latest
     steps:
       - name: Trigger deployment

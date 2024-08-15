@@ -1,7 +1,7 @@
 name: Deployment pipeline
 
 env:
-  WILL_SKIP: ${{ contains(join(github.event.commits.*.message), '#skip') }}
+  WILL_SKIP: ${{ github.event_name == 'push' && contains(github.event.commits.*.message, '#skip') }}
 
 on:
   push:

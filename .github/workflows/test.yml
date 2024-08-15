@@ -26,7 +26,7 @@ jobs:
           COMMIT_MESSAGES: ${{ toJson(github.event.head_commit.message) }}
         run: echo "$COMMIT_MESSAGES"
       - name: test condition to false
-        if: ${{ (github.event_name == 'push') && (contains(github.event.head_commit.message, '#skip')) }}
+        if: ${{ (github.event_name == 'push') && !(contains(github.event.head_commit.message, '#skip')) }}
         run: echo "WILL_SKIP == false"
       - name: test condition to true
         if: ${{ (github.event_name == 'push') && (contains(github.event.head_commit.message, '#skip')) }}

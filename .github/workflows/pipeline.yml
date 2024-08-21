@@ -32,6 +32,15 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+      - name: Send error notification to Discord if failure
+        uses: rjstone/discord-webhook-notify@v1
+        if: ${{ failure() }}
+        with:
+          severity: error
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          text: Build failed
+          description: commit ${{ github.event.commits.url }} by ${{ github.triggering_actor }} broke the build :(
+
   deployment:
     if: ${{ (github.event_name == 'push') && !(contains(github.event.head_commit.message, '#skip')) }}
     runs-on: ubuntu-latest
@@ -55,3 +64,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
+      - name: Send success notification to Discord
+        uses: rjstone/discord-webhook-notify@v1
+        if: ${{ success() }}
+        with:
+          severity: info
+          text: A new version of Pokédex was deployed
+          description: to https://full-stack-open-cicd-pokedex.onrender.com by ${{ github.triggering_actor }}
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}

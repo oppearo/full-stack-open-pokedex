@@ -9,7 +9,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,22 +40,18 @@ jobs:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           text: Build failed
           description: commit ${{ github.event.commits.url }} by ${{ github.triggering_actor }} broke the build :(
-
-  deployment:
-    if: ${{ (github.event_name == 'push') && !(contains(github.event.head_commit.message, '#skip')) }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger deployment
-        uses: sws2apps/render-deployment@main #consider using pin for dependabot auto update
-        if: ${{ github.event_name == 'push' }}
+      - name: Deploy to Render
+        if: ${{ (github.event_name == 'push') && !(contains(github.event.head_commit.message, '#skip')) }}
+        uses: sws2apps/render-deployment@main
         with:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
           apiKey: ${{ secrets.RENDER_API_KEY }}
-          multipleDeployment: false #optional, default true
+          multipleDeployment: false
+
   tag_release:
     if: ${{ (github.event_name == 'push') && !(contains(github.event.head_commit.message, '#skip')) }}
     runs-on: ubuntu-latest
-    needs: [build]
+    needs: [build_and_deploy]
     steps:
       - uses: actions/checkout@v4
       - name: Bump version and push tag
@@ -69,8 +65,8 @@ jobs:
         if: ${{ success() }}
         with:
           severity: info
-          text: A new version of Pokédex was deployed
+          text: A new version of Pokedex was deployed
           description: to ${{ env.prod-url }} by ${{ github.triggering_actor }}
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
         env:
-          prod-url: https://full-stack-open-cicd-pokedex.onrender.com
+          prod-url: "https://full-stack-open-cicd-pokedex.onrender.com"

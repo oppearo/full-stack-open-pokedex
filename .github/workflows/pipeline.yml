@@ -70,5 +70,7 @@ jobs:
         with:
           severity: info
           text: A new version of Pokédex was deployed
-          description: to https://full-stack-open-cicd-pokedex.onrender.com by ${{ github.triggering_actor }}
+          description: to ${{ env.prod-url }} by ${{ github.triggering_actor }}
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+        env:
+          prod-url: https://full-stack-open-cicd-pokedex.onrender.com
